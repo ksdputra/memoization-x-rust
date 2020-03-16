@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    benchmark-ips (2.7.2)
     benchmark-memory (0.1.2)
       memory_profiler (~> 0.9)
     ffi (1.12.2)
@@ -14,6 +15,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  benchmark-ips
   benchmark-memory
   ffi
   memery

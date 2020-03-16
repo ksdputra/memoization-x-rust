@@ -1,5 +1,6 @@
 require 'benchmark'
 require 'benchmark/memory'
+require 'benchmark/ips'
 require 'memoist'
 require 'memery'
 require 'ffi'
@@ -59,32 +60,47 @@ end
 #   # TODO search how to pass 2 arguments, and hash as an argument
 # end
 
-print 'Input number (recommend: 40) #> '
-n = gets.chomp.to_i
-puts 'Working on it...'
-puts "Normal  : #{Normal.new.fib(n)}"
-puts "MemHash : #{MemHash.new.fib(n)}"
-puts "Memoist : #{MeMoist.new.fib(n)}"
-puts "Memery  : #{MeMery.new.fib(n)}"
-puts "RustNor : #{RustNor.fibonacci(n)}"
-# puts "RustMem : #{RustMem.fib_memo({}, n)}"
-puts "\n1st Benchmarking..."
-Benchmark.bmbm do |x|
-  # x.report("Normal ") { Normal.new.fib(n) }
-  x.report("MemHash") { MemHash.new.fib(n) }
-  x.report("Memoist") { MeMoist.new.fib(n) }
-  x.report("Memery ") { MeMery.new.fib(n) }
-  x.report("RustNor") { RustNor.fibonacci(n) }
-  # x.report("RustMem") { RustMem.fib_memo({}, n) }
-end
-puts "\n2nd Benchmarking..."
-Benchmark.memory do |x|
-  # x.report("Normal ") { Normal.new.fib(n) }
-  x.report("MemHash") { MemHash.new.fib(n) }
-  x.report("Memoist") { MeMoist.new.fib(n) }
-  x.report("Memery ") { MeMery.new.fib(n) }
-  x.report("RustNor") { RustNor.fibonacci(n) }
-  # x.report("RustMem") { RustMem.fib_memo({}, n) }
+# print 'Input number (recommend: 40) #> '
+# n = gets.chomp.to_i
 
-  x.compare!
+[15, 25, 40, 50, 75, 100].each do |n|
+  puts "Fibonacci(#{n})"
+  puts 'Working on it...'
+  puts "Normal  : #{Normal.new.fib(n)}" if n < 41
+  puts "MemHash : #{MemHash.new.fib(n)}"
+  puts "Memoist : #{MeMoist.new.fib(n)}"
+  puts "Memery  : #{MeMery.new.fib(n)}"
+  puts "RustNor : #{RustNor.fibonacci(n)}" if n < 41
+  # puts "RustMem : #{RustMem.fib_memo({}, n)}"
+  puts "\n1st Benchmarking... (computation time)"
+  Benchmark.bmbm do |x|
+    x.report("Normal ") { Normal.new.fib(n) } if n < 41
+    x.report("MemHash") { MemHash.new.fib(n) }
+    x.report("Memoist") { MeMoist.new.fib(n) }
+    x.report("Memery ") { MeMery.new.fib(n) }
+    x.report("RustNor") { RustNor.fibonacci(n) }  if n < 41
+    # x.report("RustMem") { RustMem.fib_memo({}, n) }
+  end
+  puts "\n2nd Benchmarking... (iteration per second)"
+  Benchmark.ips do |x|
+    x.report("Normal ") { Normal.new.fib(n) } if n < 41
+    x.report("MemHash") { MemHash.new.fib(n) }
+    x.report("Memoist") { MeMoist.new.fib(n) }
+    x.report("Memery ") { MeMery.new.fib(n) }
+    x.report("RustNor") { RustNor.fibonacci(n) } if n < 41
+    # x.report("RustMem") { RustMem.fib_memo({}, n) }
+
+    x.compare!
+  end
+  puts "\n3rd Benchmarking... (memory allocation)"
+  Benchmark.memory do |x|
+    x.report("Normal ") { Normal.new.fib(n) } if n < 41
+    x.report("MemHash") { MemHash.new.fib(n) }
+    x.report("Memoist") { MeMoist.new.fib(n) }
+    x.report("Memery ") { MeMery.new.fib(n) }
+    x.report("RustNor") { RustNor.fibonacci(n) } if n < 41
+    # x.report("RustMem") { RustMem.fib_memo({}, n) }
+
+    x.compare!
+  end
 end
